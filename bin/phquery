@@ -6,7 +6,26 @@ use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Application as ConsoleApp;
 use Symfony\Component\Console\Command\Command;
 
-require __DIR__ . '/../vendor/autoload.php';
+$autoloadFiles = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../../../../autoload.php',
+    dirname(__DIR__) . '/vendor/autoload.php'
+];
+$loaded = false;
+foreach ($autoloadFiles as $file) {
+    if (file_exists($file)) {
+        require_once $file;
+        $loaded = true;
+        break;
+    }
+}
+if (!$loaded) {
+    die(
+        'You need to set up the project dependencies using Composer:' . PHP_EOL .
+        'php composer.phar install' . PHP_EOL
+    );
+}
 
 $version = InstalledVersions::getVersion('procket/phquery');
 $consoleApp = new ConsoleApp('phquery', $version);

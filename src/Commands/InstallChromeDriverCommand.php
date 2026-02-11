@@ -203,7 +203,7 @@ class InstallChromeDriverCommand extends Command
             return $this->latestVersion();
         }
 
-        if (!ctype_digit($version)) {
+        if (!ctype_digit((string)$version)) {
             return (string)$version;
         }
 
@@ -331,13 +331,27 @@ class InstallChromeDriverCommand extends Command
 
         $zip->open($archive);
 
-        $zip->extractTo($this->getBinDirectory());
+        $binary = null;
 
-        $binary = $zip->getNameIndex(version_compare($version, '115.0', '<') ? 0 : 1);
+        for ($fileIndex = 0; $fileIndex < $zip->numFiles; $fileIndex++) {
+            $filename = $zip->getNameIndex($fileIndex);
+
+            if (Str::startsWith(basename($filename), 'chromedriver')) {
+                $binary = $filename;
+
+                $zip->extractTo($this->getBinDirectory(), $binary);
+
+                break;
+            }
+        }
 
         $zip->close();
 
         unlink($archive);
+
+        if (!$binary) {
+            throw new Exception('Could not extract the ChromeDriver binary.');
+        }
 
         return $binary;
     }
