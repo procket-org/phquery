@@ -171,7 +171,7 @@ class InstallChromeDriverCommand extends Command
             if ($all || ($os === $currentOS)) {
                 $archive = $this->download($version, $os);
 
-                $binary = $this->extract($version, $archive);
+                $binary = $this->extract($archive);
 
                 $this->rename($binary, $os);
             }
@@ -320,12 +320,11 @@ class InstallChromeDriverCommand extends Command
     /**
      * Extract the ChromeDriver binary from the archive and delete the archive.
      *
-     * @param string $version
      * @param string $archive
      * @return string
      * @throws Exception
      */
-    protected function extract(string $version, string $archive): string
+    protected function extract(string $archive): string
     {
         $zip = new ZipArchive;
 
